@@ -24,3 +24,108 @@ bonds.films = [
   { title: "A View to a Kill", year: 1985, actor: "Roger Moore", gross: "$321,172,633" },
   { title: "Licence to Kill", year: 1989, actor: "Timothy Dalton", gross: "$285,157,191" }
 ];
+
+bonds.gross = function(film) {
+  return parseInt(film.gross.slice(1).split(',').join(''));
+};
+
+bonds.getActors = function() {
+  return _.uniq(_.pluck(bonds.films, "actor"));
+};
+
+bonds.totalGross = function() {
+  var grossArray = _.map(bonds.films, function(film){ return bonds.gross(film) });
+  return _.reduce(grossArray, function(memo, num) {return memo + num } );
+};
+
+bonds.titles = function(object) {
+  object = object || {};
+  return _.compact(
+    _.map(bonds.films, function(film) {
+      var film_array = film.title.split(' ');
+      if (film_array.length === object.words) {
+        return film.title;
+      } else {
+      }
+    })
+  )
+};
+
+bonds.starCount = function() {
+  count = {}
+  _.each(bonds.getActors(), function(actor) {
+    return count[actor] = _.where(_.pluck(bonds.films, "actor"), actor).length;
+  });
+  return count;
+};
+
+bonds.loneliestBond = function() {
+  var index = _.indexOf(_.values(bonds.starCount()),_.min(bonds.starCount()));
+  return _.keys(bonds.starCount())[index]
+};
+
+bonds.oddBonds = function() {
+  return _.compact(
+    _.map(bonds.films, function(film) {
+      if ( film.year % 2 !== 0 ) {
+        return film.title;
+      } else {
+      }
+    })
+  )
+};
+
+bonds.bestBond = function() {
+
+  var groupFilms = _.groupBy(bonds.films, function(film){return film.actor})
+  var grossArray = _.map(groupFilms, function(obj, actor){
+    var average = _.reduce(obj, function(memo, movie){ return memo + bonds.gross(movie) }, 0) / obj.length;
+    return {actor: actor, gross: average};
+  })
+  return _.max(grossArray, function(actorGross){return actorGross.gross});
+
+// PHIL'S ANSWER
+  // return _.max(
+  //   _.map(_.groupBy(bonds.films, "actor"), function(films, actor) {
+  //     var numberOfFilms = films.length;
+  //     var grosses = _.map(films, function(film) {
+  //       return bonds.gross(film)
+  //     });
+  //     var totalGross = _.reduce(grosses, function(memo, num) {
+  //       return memo + num;
+  //     });
+  //     var average = totalGross/numberOfFilms;
+  //     return { actor: actor, gross: average };
+  //   }), function(actor) {
+  //     return actor.gross;
+  //   });
+
+}
+
+bonds.worstBond = function() {
+
+  var groupFilms = _.groupBy(bonds.films, function(film){return film.actor})
+  var grossArray = _.map(groupFilms, function(obj, actor){
+    var average = _.reduce(obj, function(memo, movie){ return memo + bonds.gross(movie) }, 0) / obj.length;
+    return {actor: actor, gross: average};
+  })
+  return _.min(grossArray, function(actorGross){return actorGross.gross});
+
+//  PHIL'S ANSWER
+  // return _.min(
+  //   _.map(_.groupBy(bonds.films, "actor"), function(films, actor) {
+  //     var numberOfFilms = films.length;
+  //     var grosses = _.map(films, function(film) {
+  //       return bonds.gross(film)
+  //     });
+  //     var totalGross = _.reduce(grosses, function(memo, num) {
+  //       return memo + num;
+  //     });
+  //     var average = totalGross/numberOfFilms;
+  //     return { actor: actor, gross: average };
+  //   }), function(actor) {
+  //     return actor.gross;
+  //   });
+}
+
+

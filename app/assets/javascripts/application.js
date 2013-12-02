@@ -8,4 +8,5 @@
 //= require handlebars
 //= require underscore
 //= require backbone
+//= require_tree ./backbone
 //= require app
